@@ -37,3 +37,17 @@ enum PaymentStatus {
     FAILED
     REFUNDED
 }
+
+enum SubscriptionStatus {
+    ACTIVE
+    CANCELED
+    EXPIRED
+}
+
+enum Role {
+    ADMIN
+    USER
+    AUTHOR
+    CUSTOMER
+    PROVIDER
+}

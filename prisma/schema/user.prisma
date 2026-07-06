@@ -13,7 +13,9 @@ model User {
     updatedAt DateTime @updatedAt
 
     // Relations
-    gearItems GearItem[]
-    rentals   RentalOrder[]
-    reviews   Review[]
+    // gearItems GearItem[]
+    // rentals   RentalOrder[]
+    // reviews   Review[]
+
+    @@map("users")
 }

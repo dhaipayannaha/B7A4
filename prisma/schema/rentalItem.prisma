@@ -1,19 +1,19 @@
-model RentalOrderItem {
-    id String @id @default(cuid())
+// model RentalOrderItem {
+//     id String @id @default(cuid())
 
-    rentalOrderId String
-    gearItemId    String
+//     rentalOrderId String
+//     gearItemId    String
 
-    quantity    Int
-    pricePerDay Float
-    rentalDays  Int
-    subtotal    Float
+//     quantity    Int
+//     pricePerDay Float
+//     rentalDays  Int
+//     subtotal    Float
 
-    createdAt DateTime @default(now())
+//     createdAt DateTime @default(now())
 
-    // Relations
-    rentalOrder RentalOrder @relation(fields: [rentalOrderId], references: [id], onDelete: Cascade)
-    gearItem    GearItem    @relation(fields: [gearItemId], references: [id])
+//     // Relations
+//     rentalOrder RentalOrder @relation(fields: [rentalOrderId], references: [id], onDelete: Cascade)
+//     gearItem    GearItem    @relation(fields: [gearItemId], references: [id])
 
-    @@unique([rentalOrderId, gearItemId])
-}
+//     @@unique([rentalOrderId, gearItemId])
+// }
