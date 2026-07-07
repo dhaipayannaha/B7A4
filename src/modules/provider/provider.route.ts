@@ -9,10 +9,13 @@ import { Role } from "../../../generated/prisma/enums";
 
 const router = Router();
 
-router.post("/gear", auth(Role.PROVIDER), providerController.createGear);
-router.put("/gear/:id", auth(Role.PROVIDER), providerController.updateGear);
+router.post("/provider/gear", auth(Role.PROVIDER), providerController.createGear);
+router.put("/provider/gear/:id", auth(Role.PROVIDER), providerController.updateGear);
 
-router.delete("/gear/:id", auth(Role.PROVIDER), providerController.deleteGear);
+router.delete("/provider/gear/:id", auth(Role.PROVIDER), providerController.deleteGear);
+
+router.get("/gear", providerController.getAllGear)
+router.get("/gear/:id", providerController.getSingleGear)
 
 
 export const providerRoutes = router;

@@ -33,7 +33,7 @@ import { globalErrorHandelar } from "./middleweares/globalerrorHandelar";
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 
-app.use("/api/provider", providerRoutes);
+app.use("/api", providerRoutes);
 app.use("/api/category", categoryRoutes);
 
 app.use(globalErrorHandelar);

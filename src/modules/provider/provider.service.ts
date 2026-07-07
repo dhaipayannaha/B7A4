@@ -84,8 +84,42 @@ const deleteGear = async (postId: string, authorId: string, isAdmin: boolean) =>
     return result;
 }
 
+const getAllGear = async () => {
+    const result = await prisma.gearItem.findMany({
+        include: {
+            provider: {
+                omit: {
+                    password: true
+                }
+            },
+            category: true
+        }
+    })
+    return result;
+}
+
+const getSingleGear = async (postId: string) => {
+    const result = await prisma.gearItem.findUnique({
+        where: {
+            id: postId
+        },
+        include: {
+            provider: {
+                omit: {
+                    password: true
+                }
+            },
+            category: true
+        }
+    })
+    return result;
+
+}
+
 export const providerService = {
     createGear,
     updateGear,
-    deleteGear
+    deleteGear,
+    getAllGear,
+    getSingleGear
 };

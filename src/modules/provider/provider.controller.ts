@@ -59,9 +59,43 @@ const deleteGear = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
+const getAllGear = catchAsync(async (req: Request, res: Response) => {
+    const result = await providerService.getAllGear();
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Gear items fetched successfully",
+        data: result
+    })
+})
+
+const getSingleGear = catchAsync(async (req: Request, res: Response) => {
+    const { id: postId } = req.params;
+
+    if (!postId) {
+        throw new Error("Gear Id Required in Params")
+    }
+
+    const result = await providerService.getSingleGear(postId as string);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Gear item fetched successfully",
+        data: result
+    })
+
+})
+
 
 export const providerController = {
     createGear,
     updateGear,
-    deleteGear
+    deleteGear,
+    getAllGear,
+    getSingleGear
+}
+
+function async(arg0: (req: Request, res: Response) => void): import("express").RequestHandler<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> {
+    throw new Error("Function not implemented.");
 }
