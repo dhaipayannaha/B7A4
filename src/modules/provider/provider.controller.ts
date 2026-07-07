@@ -98,7 +98,6 @@ const getSingleGear = catchAsync(async (req: Request, res: Response) => {
 
 })
 
-
 export const providerController = {
     createGear,
     updateGear,
