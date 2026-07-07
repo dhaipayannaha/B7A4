@@ -24,11 +24,44 @@ const createGear = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateGear = catchAsync(async (req: Request, res: Response) => {
+    const authorId = req.user?.id;
+    const isProvider = req.user?.role === "PROVIDER";
+    const postId = req.params.id;
+    const payload = req.body;
 
+    const result = await providerService.updateGear(postId as string, payload, authorId as string, isProvider as boolean);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Post updated successfully",
+        data: result
+    })
+})
+
+const deleteGear = catchAsync(async (req: Request, res: Response) => {
+
+    const authorId = req.user?.id;
+    const isProvider = req.user?.role === "PROVIDER";
+    const postId = req.params.id;
+
+    if (!postId) {
+        throw new Error("Post Id Required in Params")
+    }
+
+    const result = await providerService.deleteGear(postId as string, authorId as string, isProvider as boolean);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Post deleted successfully",
+        data: result
+    })
 })
 
 
 export const providerController = {
     createGear,
-    updateGear
+    updateGear,
+    deleteGear
 }
