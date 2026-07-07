@@ -60,11 +60,11 @@ const deleteGear = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getAllGear = catchAsync(async (req: Request, res: Response) => {
-    const { searchTerm, categoryId, brand, minPrice, maxPrice, condition, status } = req.query;
+    const { searchTerm, category, brand, minPrice, maxPrice, condition, status } = req.query;
 
     const result = await providerService.getAllGear({
         searchTerm: searchTerm as string | undefined,
-        categoryId: categoryId as string | undefined,
+        category: category as string | undefined,
         brand: brand as string | undefined,
         minPrice: minPrice !== undefined ? Number(minPrice) : undefined,
         maxPrice: maxPrice !== undefined ? Number(maxPrice) : undefined,

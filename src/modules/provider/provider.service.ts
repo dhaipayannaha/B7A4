@@ -85,11 +85,13 @@ const deleteGear = async (postId: string, authorId: string, isAdmin: boolean) =>
 }
 
 const getAllGear = async (query: IGearQuery) => {
-    const { searchTerm, categoryId, brand, minPrice, maxPrice, condition, status } = query;
+    const { searchTerm, category, brand, minPrice, maxPrice, condition, status } = query;
 
     const result = await prisma.gearItem.findMany({
         where: {
-            ...(categoryId && { categoryId }),
+            ...(category && {
+                category: { name: { equals: category, mode: "insensitive" } },
+            }),
             ...(brand && { brand: { equals: brand, mode: "insensitive" } }),
             ...(condition && { condition }),
             ...(status && { status }),

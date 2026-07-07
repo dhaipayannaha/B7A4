@@ -16,7 +16,7 @@ export interface IGearItem {
 
 export interface IGearQuery {
     searchTerm?: string;   // searches title, brand, model
-    categoryId?: string;
+    category?: string;     // filter by category name e.g. "cycling", "camping"
     brand?: string;
     minPrice?: number;
     maxPrice?: number;
