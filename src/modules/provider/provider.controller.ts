@@ -60,13 +60,24 @@ const deleteGear = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getAllGear = catchAsync(async (req: Request, res: Response) => {
-    const result = await providerService.getAllGear();
+    const { searchTerm, categoryId, brand, minPrice, maxPrice, condition, status } = req.query;
+
+    const result = await providerService.getAllGear({
+        searchTerm: searchTerm as string | undefined,
+        categoryId: categoryId as string | undefined,
+        brand: brand as string | undefined,
+        minPrice: minPrice !== undefined ? Number(minPrice) : undefined,
+        maxPrice: maxPrice !== undefined ? Number(maxPrice) : undefined,
+        condition: condition as any,
+        status: status as any,
+    });
+
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: "Gear items fetched successfully",
-        data: result
-    })
+        data: result,
+    });
 })
 
 const getSingleGear = catchAsync(async (req: Request, res: Response) => {

@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import { IGearItem } from "./provider.interface";
+import { IGearItem, IGearQuery } from "./provider.interface";
 
 const createGear = async (providerId: string, payload: IGearItem) => {
     const { categoryId, ...restPayload } = payload;
@@ -84,17 +84,40 @@ const deleteGear = async (postId: string, authorId: string, isAdmin: boolean) =>
     return result;
 }
 
-const getAllGear = async () => {
+const getAllGear = async (query: IGearQuery) => {
+    const { searchTerm, categoryId, brand, minPrice, maxPrice, condition, status } = query;
+
     const result = await prisma.gearItem.findMany({
+        where: {
+            ...(categoryId && { categoryId }),
+            ...(brand && { brand: { equals: brand, mode: "insensitive" } }),
+            ...(condition && { condition }),
+            ...(status && { status }),
+            ...(minPrice !== undefined || maxPrice !== undefined
+                ? {
+                      dailyRate: {
+                          ...(minPrice !== undefined && { gte: Number(minPrice) }),
+                          ...(maxPrice !== undefined && { lte: Number(maxPrice) }),
+                      },
+                  }
+                : {}),
+            ...(searchTerm && {
+                OR: [
+                    { title: { contains: searchTerm, mode: "insensitive" } },
+                    { brand: { contains: searchTerm, mode: "insensitive" } },
+                    { model: { contains: searchTerm, mode: "insensitive" } },
+                ],
+            }),
+        },
         include: {
             provider: {
                 omit: {
-                    password: true
-                }
+                    password: true,
+                },
             },
-            category: true
-        }
-    })
+            category: true,
+        },
+    });
     return result;
 }
 

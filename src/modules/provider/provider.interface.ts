@@ -13,3 +13,13 @@ export interface IGearItem {
     status?: GearStatus;
     categoryId: string;
 }
+
+export interface IGearQuery {
+    searchTerm?: string;   // searches title, brand, model
+    categoryId?: string;
+    brand?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    condition?: GearCondition;
+    status?: GearStatus;
+}
