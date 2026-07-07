@@ -54,7 +54,7 @@ const deleteGear = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: "Post deleted successfully",
+        message: "Gare deleted successfully",
         data: result
     })
 })
