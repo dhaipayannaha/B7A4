@@ -35,6 +35,7 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api", providerRoutes);
 app.use("/api/category", categoryRoutes);
+app.use("/api/rentals",)
 
 app.use(globalErrorHandelar);
 
