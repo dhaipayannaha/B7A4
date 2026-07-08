@@ -11,7 +11,7 @@ export interface IGearItem {
     images: string[];
     condition?: GearCondition;
     status?: GearStatus;
-    categoryId: string;
+    categoryName: string;
 }
 
 export interface IGearQuery {

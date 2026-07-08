@@ -2,20 +2,19 @@ import { prisma } from "../../lib/prisma";
 import { IGearItem, IGearQuery } from "./gear.interface";
 
 const createGear = async (providerId: string, payload: IGearItem) => {
-    const { categoryId, ...restPayload } = payload;
+    const { categoryName, ...restPayload } = payload;
 
-    if (!categoryId) {
-        throw new Error("Category id is required");
+    if (!categoryName) {
+        throw new Error("Category name is required");
     }
 
-    // Optional but recommended: verify category actually exists before hitting Prisma,
-    // so you get a clean 404 instead of a Prisma validation/foreign-key error.
-    const category = await prisma.category.findUnique({
-        where: { id: categoryId },
+    // Look up the category by name (case-insensitive)
+    const category = await prisma.category.findFirst({
+        where: { name: { equals: categoryName, mode: "insensitive" } },
     });
 
     if (!category) {
-        throw new Error("Category not found");
+        throw new Error(`Category "${categoryName}" not found`);
     }
 
     const result = await prisma.gearItem.create({
@@ -25,7 +24,7 @@ const createGear = async (providerId: string, payload: IGearItem) => {
                 connect: { id: providerId },
             },
             category: {
-                connect: { id: categoryId },
+                connect: { id: category.id },
             },
         },
     });
