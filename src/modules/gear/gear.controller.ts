@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { catchAsync } from "../../utilities/catchAsync";
-import { providerService } from "./provider.service";
+import { providerService } from "./gear.service";
 import httpStatus from "http-status";
 import { sendResponse } from "../../utilities/sendResponse";
 

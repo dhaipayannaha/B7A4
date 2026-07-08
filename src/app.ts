@@ -4,7 +4,7 @@ import express, { Application, NextFunction, request, Request, Response } from "
 import config from "./config";
 import { userRoutes } from "./modules/user/user.route";
 import { authRoutes } from "./modules/auth/auth.route";
-import { providerRoutes } from "./modules/provider/provider.route";
+import { providerRoutes } from "./modules/gear/gear.route";
 import { categoryRoutes } from "./modules/category/category.route";
 
 

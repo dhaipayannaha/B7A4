@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import { IGearItem, IGearQuery } from "./provider.interface";
+import { IGearItem, IGearQuery } from "./gear.interface";
 
 const createGear = async (providerId: string, payload: IGearItem) => {
     const { categoryId, ...restPayload } = payload;
@@ -97,11 +97,11 @@ const getAllGear = async (query: IGearQuery) => {
             ...(status && { status }),
             ...(minPrice !== undefined || maxPrice !== undefined
                 ? {
-                      dailyRate: {
-                          ...(minPrice !== undefined && { gte: Number(minPrice) }),
-                          ...(maxPrice !== undefined && { lte: Number(maxPrice) }),
-                      },
-                  }
+                    dailyRate: {
+                        ...(minPrice !== undefined && { gte: Number(minPrice) }),
+                        ...(maxPrice !== undefined && { lte: Number(maxPrice) }),
+                    },
+                }
                 : {}),
             ...(searchTerm && {
                 OR: [
