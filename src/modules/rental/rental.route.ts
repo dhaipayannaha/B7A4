@@ -1,6 +1,6 @@
 import { Router } from "express";
-
-
+import { rentalController } from "./rental.controller";
+import { auth } from "../../middleweares/auth";
 
 
 
@@ -8,6 +8,7 @@ import { Router } from "express";
 
 const router = Router();
 
-router.post('rentals',)
+router.post('/rentals', auth(), rentalController.createRental);
+router.get('/rentals', auth(), rentalController.getAllRentals);
 
 export const rentalRoutes = router;

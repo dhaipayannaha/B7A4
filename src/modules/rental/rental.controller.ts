@@ -19,6 +19,19 @@ const createRental = catchAsync(async (req: Request, res: Response, next: NextFu
     });
 })
 
+const getAllRentals = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    const result = await rentalService.getAllRentals(userId as string);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Rentals retrieved successfully",
+        data: result,
+    });
+});
+
 export const rentalController = {
-    createRental
+    createRental,
+    getAllRentals
 }

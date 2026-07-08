@@ -29,13 +29,14 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 import { globalErrorHandelar } from "./middleweares/globalerrorHandelar";
+import { rentalRoutes } from "./modules/rental/rental.route";
 
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 
 app.use("/api", providerRoutes);
 app.use("/api/category", categoryRoutes);
-app.use("/api/rentals",)
+app.use("/api", rentalRoutes)
 
 app.use(globalErrorHandelar);
 

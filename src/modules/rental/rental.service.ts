@@ -22,6 +22,25 @@ const createRental = async (payload: IcreateReantal, userId: string) => {
     return result;
 }
 
+const getAllRentals = async (userId: string) => {
+    const result = await prisma.rentalOrder.findMany({
+        where: {
+            customerId: userId
+        },
+        include: {
+            customer: true,
+            _count: {
+                select: {
+                    reviews: true
+                }
+            }
+        }
+    })
+
+    return result;
+}
+
 export const rentalService = {
-    createRental
+    createRental,
+    getAllRentals
 }
