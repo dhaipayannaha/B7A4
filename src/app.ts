@@ -36,7 +36,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 
 app.use("/api", providerRoutes);
-app.use("/api/category", categoryRoutes);
+app.use("/api", categoryRoutes);
 app.use("/api", rentalRoutes);
 
 app.use("/api/provider", orderRoutes)

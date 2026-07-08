@@ -18,5 +18,7 @@ router.get("/gear", providerController.getAllGear)
 router.get("/gear/:id", providerController.getSingleGear)
 
 
+
+
 export const providerRoutes = router;
 
