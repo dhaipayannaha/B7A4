@@ -40,7 +40,30 @@ const getAllRentals = async (userId: string) => {
     return result;
 }
 
+const getRentalById = async (id: string) => {
+    const result = await prisma.rentalOrder.findUniqueOrThrow({
+        where: {
+            id
+        },
+        include: {
+            customer: {
+                omit: {
+                    password: true
+                }
+            },
+            _count: {
+                select: {
+                    reviews: true
+                }
+            }
+        }
+    });
+
+    return result;
+}
+
 export const rentalService = {
     createRental,
-    getAllRentals
+    getAllRentals,
+    getRentalById
 }
