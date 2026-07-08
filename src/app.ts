@@ -30,13 +30,17 @@ app.get('/', (req: Request, res: Response) => {
 
 import { globalErrorHandelar } from "./middleweares/globalerrorHandelar";
 import { rentalRoutes } from "./modules/rental/rental.route";
+import { orderRoutes } from "./modules/orders/orders.router";
 
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 
 app.use("/api", providerRoutes);
 app.use("/api/category", categoryRoutes);
-app.use("/api", rentalRoutes)
+app.use("/api", rentalRoutes);
+
+app.use("/api/provider", orderRoutes)
+
 
 app.use(globalErrorHandelar);
 
