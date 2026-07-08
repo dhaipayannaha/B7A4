@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma";
+import { RentalStatus } from "../../../generated/prisma/enums";
 
 
 
@@ -24,6 +25,38 @@ const getAllOrders = async (providerId: string) => {
 }
 
 
+const updateOrderStatus = async (
+    orderId: string,
+    providerId: string,
+    status: RentalStatus
+) => {
+    // Verify the order belongs to this provider before updating
+    const order = await prisma.rentalOrder.findFirst({
+        where: {
+            id: orderId,
+            gearItem: {
+                providerId: providerId
+            }
+        }
+    });
+
+    if (!order) {
+        throw new Error("Order not found or you are not authorized to update it");
+    }
+
+    const result = await prisma.rentalOrder.update({
+        where: { id: orderId },
+        data: { status },
+        include: {
+            customer: true,
+            gearItem: true
+        }
+    });
+
+    return result;
+};
+
 export const orderService = {
-    getAllOrders
+    getAllOrders,
+    updateOrderStatus
 }
