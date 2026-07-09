@@ -13,7 +13,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "stripe:webhook": "stripe listen --forward-to localhost:5000/api/subscription/webhook",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "prisma generate"
+    "postinstall": "npx prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
