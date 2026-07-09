@@ -32,6 +32,7 @@ import { globalErrorHandelar } from "./middleweares/globalerrorHandelar";
 import { rentalRoutes } from "./modules/rental/rental.route";
 import { orderRoutes } from "./modules/orders/orders.router";
 import { reviewRoutes } from "./modules/reviews/reviews.routes";
+import { paymentRoutes } from "./modules/payment/payment.route";
 
 app.use("/api", userRoutes);
 app.use("/api/auth", authRoutes);
@@ -41,7 +42,9 @@ app.use("/api", categoryRoutes);
 app.use("/api", rentalRoutes);
 
 app.use("/api/provider", orderRoutes);
-app.use("/api", reviewRoutes)
+app.use("/api", reviewRoutes);
+
+app.use("/api/payments", paymentRoutes)
 
 
 app.use(globalErrorHandelar);
