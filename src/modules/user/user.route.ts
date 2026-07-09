@@ -9,7 +9,7 @@ const router = Router();
 router.post("/user/register", UserController.registerUser);
 
 router.get("/user/me",
-    auth(Role.CUSTOMER, Role.PROVIDER),
+    auth(Role.CUSTOMER, Role.PROVIDER, Role.ADMIN),
     UserController.getMyProfile);
 
 router.get("/admin/users", auth(Role.ADMIN), UserController.getUsers);

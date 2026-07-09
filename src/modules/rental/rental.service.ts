@@ -1,5 +1,6 @@
 import { prisma } from "../../lib/prisma"
 import { IcreateReantal } from "./rental.interface"
+import { Role } from "../../../generated/prisma/enums"
 
 
 
@@ -22,11 +23,10 @@ const createRental = async (payload: IcreateReantal, userId: string) => {
     return result;
 }
 
-const getAllRentals = async (userId: string) => {
+const getAllRentals = async (userId: string, role: string) => {
+    const query = role === Role.ADMIN ? {} : { customerId: userId };
     const result = await prisma.rentalOrder.findMany({
-        where: {
-            customerId: userId
-        },
+        where: query,
         include: {
             customer: true,
             _count: {
@@ -62,8 +62,28 @@ const getRentalById = async (id: string) => {
     return result;
 }
 
+
+const myRentals = async (userId: string) => {
+    const result = await prisma.rentalOrder.findMany({
+        where: {
+            customerId: userId
+        },
+        include: {
+            customer: true,
+            _count: {
+                select: {
+                    reviews: true
+                }
+            }
+        }
+    })
+
+    return result;
+}
+
 export const rentalService = {
     createRental,
     getAllRentals,
-    getRentalById
+    getRentalById,
+    myRentals
 }
