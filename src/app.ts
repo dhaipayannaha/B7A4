@@ -33,7 +33,7 @@ import { rentalRoutes } from "./modules/rental/rental.route";
 import { orderRoutes } from "./modules/orders/orders.router";
 import { reviewRoutes } from "./modules/reviews/reviews.routes";
 
-app.use("/api/user", userRoutes);
+app.use("/api", userRoutes);
 app.use("/api/auth", authRoutes);
 
 app.use("/api", providerRoutes);
