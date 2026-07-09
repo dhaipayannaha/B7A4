@@ -17,6 +17,7 @@ router.delete("/provider/gear/:id", auth(Role.PROVIDER), providerController.dele
 router.get("/gear", providerController.getAllGear)
 router.get("/gear/:id", providerController.getSingleGear)
 
+router.get("/admin/gear", auth(Role.ADMIN), providerController.getAllGear);
 
 
 

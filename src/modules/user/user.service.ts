@@ -2,6 +2,7 @@ import config from "../../config";
 import { prisma } from "../../lib/prisma";
 import bcrypt from "bcryptjs";
 import { RegisterUserPayload } from "./user.interface";
+import { UserStatus } from "../../../generated/prisma/enums";
 
 
 const registerUserIntoDB = async (payload: RegisterUserPayload) => {
@@ -71,8 +72,20 @@ const getAllUsersFromDB = async () => {
     return users;
 }
 
+const updateUserFromDB = async (id: string, status: UserStatus) => {
+    const user = await prisma.user.update({
+        where: { id },
+        data: { status },
+        omit: {
+            password: true
+        }
+    });
+    return user;
+}
+
 export const userService = {
     registerUserIntoDB,
     getMyProfileFromDB,
-    getAllUsersFromDB
+    getAllUsersFromDB,
+    updateUserFromDB
 };
