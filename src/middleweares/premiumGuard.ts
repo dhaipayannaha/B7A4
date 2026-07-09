@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { catchAsync } from "../utilities/catchAsync";
 import { Request, Response, NextFunction } from "express";
-import { SubscriptionStatus } from "../../generated/prisma/enums";
+import { SubscriptionStatus } from "@prisma/client"
 import { prisma } from "../lib/prisma";
 
 export const subscriptionGuird = () => {

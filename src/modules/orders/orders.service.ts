@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import { RentalStatus } from "../../../generated/prisma/enums";
+import { RentalStatus } from "@prisma/client"
 
 
 

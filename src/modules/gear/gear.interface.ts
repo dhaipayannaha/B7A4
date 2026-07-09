@@ -1,4 +1,4 @@
-import { GearCondition, GearStatus } from "../../../generated/prisma/client";
+import { GearCondition, GearStatus } from "@prisma/client"
 
 export interface IGearItem {
     title: string;

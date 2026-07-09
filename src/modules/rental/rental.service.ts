@@ -1,6 +1,6 @@
 import { prisma } from "../../lib/prisma"
 import { IcreateReantal } from "./rental.interface"
-import { Role } from "../../../generated/prisma/enums"
+import { Role } from "@prisma/client"
 
 
 

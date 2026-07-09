@@ -1,7 +1,7 @@
 
 
 import { NextFunction, Request, Response } from "express";
-import { Role } from "../../generated/prisma/enums";
+import { Role } from "@prisma/client"
 import { catchAsync } from "../utilities/catchAsync";
 import { jwtUtilis } from "../utilities/jwt";
 import { prisma } from "../lib/prisma";

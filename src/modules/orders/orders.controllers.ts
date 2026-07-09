@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import { sendResponse } from "../../utilities/sendResponse";
 import httpStatus from "http-status";
 import { orderService } from "./orders.service";
-import { RentalStatus } from "../../../generated/prisma/enums";
+import { RentalStatus } from "@prisma/client"
 
 const getOrders = catchAsync(async (req: Request, res: Response) => {
 
