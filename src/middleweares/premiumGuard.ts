@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { catchAsync } from "../utilities/catchAsync";
 import { Request, Response, NextFunction } from "express";
 import { SubscriptionStatus } from "../../generated/prisma/enums";

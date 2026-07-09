@@ -2,11 +2,15 @@ import config from "../../config";
 import { prisma } from "../../lib/prisma";
 import bcrypt from "bcryptjs";
 import { RegisterUserPayload } from "./user.interface";
-import { UserStatus } from "../../../generated/prisma/enums";
+import { UserRole, UserStatus } from "../../../generated/prisma/enums";
 
 
 const registerUserIntoDB = async (payload: RegisterUserPayload) => {
     const { name, email, password, phone, image, role } = payload;
+
+    if (role && role !== UserRole.CUSTOMER && role !== UserRole.PROVIDER) {
+        throw new Error("Only CUSTOMER or PROVIDER roles are allowed during registration");
+    }
 
     // Check existing user
     const isUserExist = await prisma.user.findUnique({
