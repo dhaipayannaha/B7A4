@@ -12,4 +12,6 @@ router.get("/me",
     auth(Role.CUSTOMER, Role.PROVIDER),
     UserController.getMyProfile);
 
+router.get("admin/users", auth(Role.ADMIN), UserController.getUsers);
+
 export const userRoutes = router;

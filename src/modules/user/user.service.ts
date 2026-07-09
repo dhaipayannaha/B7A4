@@ -62,7 +62,17 @@ const getMyProfileFromDB = async (id: string) => {
 
 
 
+const getAllUsersFromDB = async () => {
+    const users = await prisma.user.findMany({
+        omit: {
+            password: true
+        }
+    });
+    return users;
+}
+
 export const userService = {
     registerUserIntoDB,
-    getMyProfileFromDB
+    getMyProfileFromDB,
+    getAllUsersFromDB
 };
