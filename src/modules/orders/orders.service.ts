@@ -24,6 +24,33 @@ const getAllOrders = async (providerId: string) => {
     return result;
 }
 
+const getOrderById = async (orderId: string, providerId: string) => {
+    const order = await prisma.rentalOrder.findFirst({
+        where: {
+            id: orderId,
+            gearItem: {
+                providerId: providerId
+            }
+        },
+        include: {
+            customer: true,
+            gearItem: true,
+            payment: true,
+            reviews: true,
+            _count: {
+                select: {
+                    reviews: true
+                }
+            }
+        }
+    });
+
+    if (!order) {
+        throw new Error("Order not found or you are not authorized to view it");
+    }
+
+    return order;
+}
 
 const updateOrderStatus = async (
     orderId: string,
@@ -58,5 +85,6 @@ const updateOrderStatus = async (
 
 export const orderService = {
     getAllOrders,
+    getOrderById,
     updateOrderStatus
 }

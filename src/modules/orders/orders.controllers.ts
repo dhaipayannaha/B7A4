@@ -23,6 +23,16 @@ const updateOrder = catchAsync(async (req: Request, res: Response) => {
     const orderId = req.params.id as string;
     const { status } = req.body as { status: RentalStatus };
 
+    const validStatuses = Object.values(RentalStatus);
+    if (!status || !validStatuses.includes(status)) {
+        return sendResponse(res, {
+            statusCode: httpStatus.BAD_REQUEST,
+            success: false,
+            message: `Invalid status. Valid values are: ${validStatuses.join(', ')}`,
+            data: null,
+        });
+    }
+
     const result = await orderService.updateOrderStatus(orderId, providerId, status);
 
     sendResponse(res, {
@@ -34,7 +44,21 @@ const updateOrder = catchAsync(async (req: Request, res: Response) => {
 })
 
 
+const getOrderById = catchAsync(async (req: Request, res: Response) => {
+    const providerId = req.user?.id as string;
+    const orderId = req.params.id as string;
+    const result = await orderService.getOrderById(orderId, providerId);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Order retrieved successfully",
+        data: result,
+    });
+})
+
 export const OrderController = {
     getOrders,
+    getOrderById,
     updateOrder,
 }

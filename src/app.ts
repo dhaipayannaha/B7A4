@@ -44,7 +44,7 @@ app.use("/api", rentalRoutes);
 app.use("/api/provider", orderRoutes);
 app.use("/api", reviewRoutes);
 
-app.use("/api", paymentRoutes)
+app.use("/api/payments", paymentRoutes)
 
 
 app.use(globalErrorHandelar);
