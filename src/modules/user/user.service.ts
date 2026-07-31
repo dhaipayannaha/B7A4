@@ -87,9 +87,21 @@ const updateUserFromDB = async (id: string, status: UserStatus) => {
     return user;
 }
 
+const updateUserRoleFromDB = async (id: string, role: UserRole) => {
+    const user = await prisma.user.update({
+        where: { id },
+        data: { role },
+        omit: {
+            password: true
+        }
+    });
+    return user;
+}
+
 export const userService = {
     registerUserIntoDB,
     getMyProfileFromDB,
     getAllUsersFromDB,
-    updateUserFromDB
+    updateUserFromDB,
+    updateUserRoleFromDB
 };
