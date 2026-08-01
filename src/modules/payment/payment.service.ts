@@ -2,38 +2,55 @@ import { prisma } from "../../lib/prisma"
 import { stripe } from "../../lib/stripe"
 import config from "../../config"
 
-const createCheckoutSession = async (userId: string) => {
-    const transactionResult = await prisma.$transaction(async (tx) => {
-        const user = await tx.user.findUniqueOrThrow({
-            where: {
-                id: userId
-            }
-        })
+const createCheckoutSession = async (userId: string, rentalOrderId: string) => {
+    // Fetch the order, verify it belongs to this user, and include the gear item name
+    const order = await prisma.rentalOrder.findFirst({
+        where: {
+            id: rentalOrderId,
+            customerId: userId,
+        },
+        include: {
+            gearItem: true,
+        },
+    });
 
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            mode: 'payment',
-            line_items: [
-                {
-                    price_data: {
-                        currency: 'usd',
-                        product_data: {
-                            name: 'Rental Order',
-                        },
-                        unit_amount: 500, // static price as requested
+    if (!order) {
+        throw new Error("Order not found or you are not authorized to pay for it");
+    }
+
+    if (order.paymentStatus === "COMPLETED") {
+        throw new Error("This order has already been paid");
+    }
+
+    if (!order.totalAmount || order.totalAmount <= 0) {
+        throw new Error("Order has an invalid total amount");
+    }
+
+    const session = await stripe.checkout.sessions.create({
+        // Omitting payment_method_types to enable Stripe dynamic payment methods
+        mode: 'payment',
+        line_items: [
+            {
+                price_data: {
+                    currency: 'bdt',
+                    product_data: {
+                        name: order.gearItem.title,
                     },
-                    quantity: 1,
+                    // totalAmount is stored in base currency units; Stripe expects smallest units (e.g. paisa/cents)
+                    unit_amount: Math.round(order.totalAmount * 100),
                 },
-            ],
-            success_url: `${config.app_url}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${config.app_url}/cancel`,
-            client_reference_id: userId,
-        });
+                quantity: 1,
+            },
+        ],
+        metadata: {
+            rentalOrderId: order.id,
+        },
+        success_url: `${config.app_url}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${config.app_url}/cancel`,
+        client_reference_id: userId,
+    });
 
-        return session;
-    })
-    
-    return transactionResult;
+    return session;
 }
 
 const confirmPayment = async (transactionId: string, rentalOrderId?: string) => {

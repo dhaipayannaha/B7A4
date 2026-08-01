@@ -6,12 +6,18 @@ import httpStatus from "http-status";
 
 const createCheckoutSession = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id;
-    const result = await paymentServices.createCheckoutSession(userId as string);
+    const { rentalOrderId } = req.body;
+
+    if (!rentalOrderId) {
+        throw new Error("rentalOrderId is required");
+    }
+
+    const result = await paymentServices.createCheckoutSession(userId as string, rentalOrderId);
 
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: "checkout completed successfully",
+        message: "Checkout session created successfully",
         data: result
     })
 })
