@@ -1,5 +1,6 @@
 import { GearCondition, GearStatus } from "@prisma/client"
 
+// Used for creating gear — all core fields required
 export interface IGearItem {
     title: string;
     description: string;
@@ -12,6 +13,21 @@ export interface IGearItem {
     condition?: GearCondition;
     status?: GearStatus;
     categoryName: string;
+}
+
+// Used for partial updates — every field is optional
+export interface IUpdateGearItem {
+    title?: string;
+    description?: string;
+    brand?: string;
+    model?: string;
+    dailyRate?: number;
+    quantity?: number;
+    availableQuantity?: number;
+    images?: string[];
+    condition?: GearCondition;
+    status?: GearStatus;
+    categoryName?: string;
 }
 
 export interface IGearQuery {

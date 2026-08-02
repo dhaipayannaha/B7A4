@@ -1,5 +1,15 @@
 import { prisma } from "../../lib/prisma";
-import { IGearItem, IGearQuery } from "./gear.interface";
+import { IGearItem, IUpdateGearItem, IGearQuery } from "./gear.interface";
+
+const SAFE_PROVIDER_SELECT = {
+    id: true,
+    name: true,
+    email: true,
+    role: true,
+    status: true,
+    createdAt: true,
+    updatedAt: true,
+};
 
 const createGear = async (providerId: string, payload: IGearItem) => {
     const { categoryName, ...restPayload } = payload;
@@ -33,35 +43,56 @@ const createGear = async (providerId: string, payload: IGearItem) => {
 };
 
 
-const updateGear = async (postId: string, payload: IGearItem, authorId: string, isAdmin: boolean) => {
-    const gear = await prisma.gearItem.findUnique({
-        where: {
-            id: postId
-        }
-    })
+const updateGear = async (postId: string, payload: IUpdateGearItem, authorId: string, isProvider: boolean) => {
+    // 1. Verify the gear exists
+    const gear = await prisma.gearItem.findUnique({ where: { id: postId } });
 
-
-    if (!isAdmin && gear?.providerId !== authorId) {
-        throw new Error("You are not authorized to update this post");
+    if (!gear) {
+        throw new Error("Gear item not found");
     }
 
-    const result = await prisma.gearItem.update({
-        where: {
-            id: postId
-        },
-        data: payload,
-        include: {
-            provider: {
-                omit: {
-                    password: true
-                }
-            },
-            category: true
+    // 2. Provider must own the gear (admin bypass uses isProvider=false so skip check for them)
+    if (isProvider && gear.providerId !== authorId) {
+        throw new Error("You are not authorized to update this gear");
+    }
+
+    // 3. Separate categoryName (relation) from the rest of the prisma fields
+    const { categoryName, ...rest } = payload;
+
+    // 4. Remove undefined/null values so Prisma only updates provided fields
+    const cleanData = Object.fromEntries(
+        Object.entries(rest).filter(([, v]) => v !== undefined && v !== null)
+    );
+
+    // 5. Resolve category relation if provided
+    let categoryConnect = {};
+    if (categoryName) {
+        const category = await prisma.category.findFirst({
+            where: { name: { equals: categoryName, mode: "insensitive" } },
+        });
+        if (!category) {
+            throw new Error(`Category "${categoryName}" not found`);
         }
-    })
-    return result;
+        categoryConnect = { category: { connect: { id: category.id } } };
+    }
 
-
+    // 6. Perform the partial update
+    console.log("[DEBUG updateGear] cleanData:", cleanData);
+    console.log("[DEBUG updateGear] categoryConnect:", categoryConnect);
+    try {
+        const result = await prisma.gearItem.update({
+            where: { id: postId },
+            data: { ...cleanData, ...categoryConnect },
+            include: {
+                provider: { select: SAFE_PROVIDER_SELECT },
+                category: true,
+            },
+        });
+        return result;
+    } catch (error) {
+        console.error("[DEBUG updateGear] Prisma Error:", error);
+        throw error;
+    }
 }
 
 const deleteGear = async (postId: string, authorId: string, isAdmin: boolean) => {
@@ -82,6 +113,7 @@ const deleteGear = async (postId: string, authorId: string, isAdmin: boolean) =>
     })
     return result;
 }
+
 
 const getAllGear = async (query: IGearQuery) => {
     const { searchTerm, category, brand, minPrice, maxPrice, condition, status } = query;
@@ -112,9 +144,7 @@ const getAllGear = async (query: IGearQuery) => {
         },
         include: {
             provider: {
-                omit: {
-                    password: true,
-                },
+                select: SAFE_PROVIDER_SELECT,
             },
             category: true,
         },
@@ -129,15 +159,12 @@ const getSingleGear = async (postId: string) => {
         },
         include: {
             provider: {
-                omit: {
-                    password: true
-                }
+                select: SAFE_PROVIDER_SELECT
             },
             category: true
         }
     })
     return result;
-
 }
 
 export const providerService = {
