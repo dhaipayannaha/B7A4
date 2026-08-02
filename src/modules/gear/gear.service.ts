@@ -161,7 +161,17 @@ const getSingleGear = async (postId: string) => {
             provider: {
                 select: SAFE_PROVIDER_SELECT
             },
-            category: true
+            category: true,
+            reviews: {
+                include: {
+                    customer: {
+                        select: SAFE_PROVIDER_SELECT
+                    }
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            }
         }
     })
     return result;

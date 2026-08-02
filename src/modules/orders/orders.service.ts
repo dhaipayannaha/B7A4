@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import { RentalStatus } from "@prisma/client"
+import { RentalStatus, PaymentStatus } from "@prisma/client"
 
 
 
@@ -55,7 +55,8 @@ const getOrderById = async (orderId: string, providerId: string) => {
 const updateOrderStatus = async (
     orderId: string,
     providerId: string,
-    status: RentalStatus
+    status?: RentalStatus,
+    paymentStatus?: PaymentStatus
 ) => {
     // Verify the order belongs to this provider before updating
     const order = await prisma.rentalOrder.findFirst({
@@ -71,9 +72,13 @@ const updateOrderStatus = async (
         throw new Error("Order not found or you are not authorized to update it");
     }
 
+    const updateData: any = {};
+    if (status) updateData.status = status;
+    if (paymentStatus) updateData.paymentStatus = paymentStatus;
+
     const result = await prisma.rentalOrder.update({
         where: { id: orderId },
-        data: { status },
+        data: updateData,
         include: {
             customer: true,
             gearItem: true

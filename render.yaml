@@ -29,3 +29,5 @@ services:
         sync: false
       - key: APP_URL
         sync: false
+      - key: FRONTEND_URL
+        value: "https://b7a5.onrender.com"

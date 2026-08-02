@@ -45,8 +45,8 @@ const createCheckoutSession = async (userId: string, rentalOrderId: string) => {
         metadata: {
             rentalOrderId: order.id,
         },
-        success_url: `${config.app_url}/success?session_id={CHECKOUT_SESSION_ID}&rentalOrderId=${order.id}`,
-        cancel_url: `${config.app_url}/cancel`,
+        success_url: `${config.frontend_url}/payment/success?session_id={CHECKOUT_SESSION_ID}&rentalOrderId=${order.id}`,
+        cancel_url: `${config.frontend_url}/payment/cancel`,
         client_reference_id: userId,
     });
 
@@ -54,15 +54,26 @@ const createCheckoutSession = async (userId: string, rentalOrderId: string) => {
 }
 
 const confirmPayment = async (transactionId: string, rentalOrderId?: string) => {
-    const session = await stripe.checkout.sessions.retrieve(transactionId);
-    
-    if (session.payment_status !== 'paid') {
-        throw new Error("Payment has not been completed");
-    }
+    // Detect if transactionId is a real Stripe checkout session (they always start with "cs_")
+    const isStripeSession = transactionId.startsWith("cs_");
 
-    let payment;
-    if (rentalOrderId) {
-        payment = await prisma.$transaction(async (tx) => {
+    if (isStripeSession) {
+        // ── Stripe flow ─────────────────────────────────────────
+        const session = await stripe.checkout.sessions.retrieve(transactionId);
+
+        if (session.payment_status !== 'paid') {
+            throw new Error("Payment has not been completed");
+        }
+
+        // Use rentalOrderId from param, or fall back to metadata in the session
+        const orderId = rentalOrderId || session.metadata?.rentalOrderId;
+
+        if (!orderId) {
+            throw new Error("Could not determine rental order ID from session");
+        }
+
+        const payment = await prisma.$transaction(async (tx) => {
+            // Idempotency check — don't double-create the payment record
             const existingPayment = await tx.payment.findUnique({
                 where: { transactionId }
             });
@@ -71,40 +82,54 @@ const confirmPayment = async (transactionId: string, rentalOrderId?: string) => 
                 return existingPayment;
             }
 
-            const order = await tx.rentalOrder.findUnique({
-                where: { id: rentalOrderId }
-            });
-
-            if (!order) {
-                throw new Error("Rental Order not found");
-            }
+            const order = await tx.rentalOrder.findUnique({ where: { id: orderId } });
+            if (!order) throw new Error("Rental Order not found");
 
             const newPayment = await tx.payment.create({
                 data: {
-                    transactionId: transactionId,
-                    rentalOrderId: rentalOrderId,
-                    amount: session.amount_total || 500,
+                    transactionId,
+                    rentalOrderId: orderId,
+                    amount: session.amount_total ? session.amount_total / 100 : order.totalAmount,
                     status: 'COMPLETED',
-                    paidAt: new Date()
+                    paidAt: new Date(),
                 }
             });
 
             await tx.rentalOrder.update({
-                where: { id: rentalOrderId },
+                where: { id: orderId },
                 data: {
                     paymentStatus: 'COMPLETED',
-                    status: 'PAID'
+                    status: 'PAID',
                 }
             });
 
             return newPayment;
         });
-    }
 
-    return {
-        paymentStatus: session.payment_status,
-        payment: payment
-    };
+        return { paymentStatus: 'paid', payment };
+    } else {
+        // ── Direct / non-Stripe flow ─────────────────────────────
+        // transactionId here is actually the rentalOrderId — just mark it as paid directly
+        const orderId = rentalOrderId || transactionId;
+
+        const order = await prisma.rentalOrder.findUnique({ where: { id: orderId } });
+        if (!order) throw new Error("Rental Order not found");
+
+        if (order.paymentStatus === 'COMPLETED') {
+            // Already paid — idempotent
+            return { paymentStatus: 'paid', payment: null };
+        }
+
+        await prisma.rentalOrder.update({
+            where: { id: orderId },
+            data: {
+                paymentStatus: 'COMPLETED',
+                status: 'PAID',
+            }
+        });
+
+        return { paymentStatus: 'paid', payment: null };
+    }
 }
 
 const getPaymentHistory = async (userId: string) => {

@@ -17,8 +17,8 @@ const createReview = async (payload: ICreateReview, customerId: string) => {
         throw new Error("Rental order not found for this gear and customer.");
     }
 
-    if (rentalOrder.status !== "RETURNED") {
-        throw new Error("You can only review gear after it has been returned.");
+    if (rentalOrder.status !== "RETURNED" && rentalOrder.paymentStatus !== "REFUNDED") {
+        throw new Error("You can only review gear after it has been returned or refunded.");
     }
 
     // Check if a review already exists

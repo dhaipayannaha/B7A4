@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import { sendResponse } from "../../utilities/sendResponse";
 import httpStatus from "http-status";
 import { orderService } from "./orders.service";
-import { RentalStatus } from "@prisma/client"
+import { RentalStatus, PaymentStatus } from "@prisma/client"
 
 const getOrders = catchAsync(async (req: Request, res: Response) => {
 
@@ -21,24 +21,47 @@ const getOrders = catchAsync(async (req: Request, res: Response) => {
 const updateOrder = catchAsync(async (req: Request, res: Response) => {
     const providerId = req.user?.id as string;
     const orderId = req.params.id as string;
-    const { status } = req.body as { status: RentalStatus };
+    const { status, paymentStatus } = req.body as { status?: RentalStatus; paymentStatus?: PaymentStatus };
 
-    const validStatuses = Object.values(RentalStatus);
-    if (!status || !validStatuses.includes(status)) {
+    if (!status && !paymentStatus) {
         return sendResponse(res, {
             statusCode: httpStatus.BAD_REQUEST,
             success: false,
-            message: `Invalid status. Valid values are: ${validStatuses.join(', ')}`,
+            message: "Provide at least one of 'status' or 'paymentStatus' to update.",
             data: null,
         });
     }
 
-    const result = await orderService.updateOrderStatus(orderId, providerId, status);
+    if (status) {
+        const validStatuses = Object.values(RentalStatus);
+        if (!validStatuses.includes(status)) {
+            return sendResponse(res, {
+                statusCode: httpStatus.BAD_REQUEST,
+                success: false,
+                message: `Invalid status. Valid values are: ${validStatuses.join(', ')}`,
+                data: null,
+            });
+        }
+    }
+
+    if (paymentStatus) {
+        const validPaymentStatuses = Object.values(PaymentStatus);
+        if (!validPaymentStatuses.includes(paymentStatus)) {
+            return sendResponse(res, {
+                statusCode: httpStatus.BAD_REQUEST,
+                success: false,
+                message: `Invalid paymentStatus. Valid values are: ${validPaymentStatuses.join(', ')}`,
+                data: null,
+            });
+        }
+    }
+
+    const result = await orderService.updateOrderStatus(orderId, providerId, status, paymentStatus);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Order status updated successfully",
+        message: "Order updated successfully",
         data: result,
     });
 })

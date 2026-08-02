@@ -10,8 +10,20 @@ import { categoryRoutes } from "./modules/category/category.route";
 
 const app: Application = express();
 
+const allowedOrigins = [
+    config.app_url,
+    "http://localhost:3000",
+    "https://b7a5.onrender.com"
+];
+
 app.use(cors({
-    origin: config.app_url,
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 }));
 
